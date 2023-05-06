@@ -1,9 +1,5 @@
 <template>
-  <b-navbar
-    :class="{navbar_root: true, navbarSticky: isScrollSticky}"
-    @scroll ="scrollSticky"
-    toggleable="lg"
-  >
+  <b-navbar :class="{ navbar_root: true, navbarSticky: isScrollSticky }" @scroll="scrollSticky" toggleable="lg">
     <!-- logo -->
     <b-navbar-brand class="brand_name">
       <h1>
@@ -34,12 +30,8 @@
         </b-nav-item>
         <b-nav-item right>
           <div class="product_category_search">
-            <input
-              type="text"
-              placeholder="經典款 or 新款 or AR(產品名)"
-              v-model="searchText"
-              @keyup.enter="searchProductCategory"
-            >
+            <input type="text" placeholder="經典款 or 新款 or AR(產品名)" v-model="searchText"
+              @keyup.enter="searchProductCategory">
             <div class="search" @click="searchProductCategory">
               <i class="fas fa-search"></i>
             </div>
@@ -54,78 +46,64 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { reactive, ref, onMounted, computed } from '@vue/composition-api'
+import { useStore } from "@/store"
 import ShoppingCart from '@/components/ShoppingCart.vue'
-
 export default {
   name: 'Navbar',
   components: {
     ShoppingCart
   },
-  data () {
-    return {
-      searchText: '',
-      checkSignInData: false,
-      isScrollSticky: false
-    }
-  },
-  computed: {
-    ...mapState([
-      'checkSignIn',
-      'orgProductsClassic',
-      'orgProductsNews'
-    ]),
-    checkLogIn () {
-      return this.checkSignIn
-    }
-  },
-  mounted () {
-    this.windowScroll()
-  },
-  methods: {
-    ...mapActions([
-      'signOutChange'
-    ]),
-    searchProductCategory () {
-      if (!this.searchText || (this.searchText && this.searchText !== '經典款' && this.searchText !== '新款')) return
+  setup() {
+    const searchText = ref('');
+    const isScrollSticky = ref(false);
+    const store = useStore();
+
+    onMounted(() => {
+      windowScroll();
+    });
+
+    const windowScroll = () => window.addEventListener('scroll', scrollSticky);
+
+    const scrollSticky = () => {
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      if (scrollTop > 50) {
+        isScrollSticky.value = true;
+        return
+      };
+
+      isScrollSticky.value = false;
+    };
+
+    const checkLogIn = computed(() => store.state.checkSignIn);
+
+    const signOut = () => store.dispatch('signOutChange');
+
+    const searchProductCategory = () => {
+      if (searchText.value || (searchText.value && searchText.value !== '經典款' && searchText.value !== '新款')) return
+
       // 分兩邊 一個是category  redirection to productsPage
       // 一個是prodcut redirection to singlePage
-      this.$store.commit('navbarSearchProductCategory', this.searchText)
-      this.$router.push('/productsPage')
-      if (this.searchText === '經典款' || this.searchText === '新款') return
+      store.commit('navbarSearchProductCategory', searchText.value)
+      router.push('/productsPage')
+      if (searchText.value === '經典款' || searchText.value === '新款') return
 
-      // this.getProductDetail(this.searchText)
-      this.$router.push({
+      router.push({
         name: 'SingleProduct',
-        query: this.getProductDetail(this.searchText)
+        query: getProductDetail(searchText.value)
       })
-    },
-    signOut () {
-      this.signOutChange()
-    },
-    windowScroll () {
-      window.addEventListener('scroll', this.scrollSticky)
-    },
-    scrollSticky () {
-      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
-      if (scrollTop > 50) {
-        this.isScrollSticky = true
-        return
-      }
+    };
 
-      this.isScrollSticky = false
-    },
-    getProductDetail (searchText) {
-      const titleSplit = searchText.split('')
-
-      const query = {
+    const getProductDetail = () => {
+      const titleSplit = reactive(searchText.value.split(''));
+      const query = reactive({
         id: '',
         category: ''
-      }
+      });
       switch (titleSplit[0]) {
         case 'A':
           query.category = '經典款'
-          this.orgProductsClassic.forEach(item => {
+          store.state.orgProductsClassic.forEach(item => {
             if (item.title === searchText) {
               query.id = item.id
             }
@@ -133,7 +111,7 @@ export default {
           break
         case 'B':
           query.category = '經典款'
-          this.orgProductsClassic.forEach(item => {
+          store.state.orgProductsClassic.forEach(item => {
             if (item.title === searchText) {
               query.id = item.id
             }
@@ -141,14 +119,26 @@ export default {
           break
         case 'V':
           query.category = '新款'
-          this.orgProductsNews.forEach(item => {
+          store.state.orgProductsNews.forEach(item => {
             if (item.title === searchText) {
               query.id = item.id
             }
           })
           break
       }
+
       return query
+    };
+
+    return {
+      ShoppingCart,
+      searchText,
+      isScrollSticky,
+      scrollSticky,
+      checkLogIn,
+      signOut,
+      searchProductCategory,
+      getProductDetail
     }
   }
 }
@@ -164,10 +154,12 @@ export default {
   background-color: #7B7B7B !important;
   padding: 0 100px;
   opacity: 0.9;
+
   h1 {
     margin: 0;
     font-size: 0;
     font-weight: normal;
+
     a {
       color: white;
       text-decoration: none;
@@ -175,24 +167,29 @@ export default {
     }
   }
 }
+
 .navbar_root {
   .navigation_content_right {
     .product_category_search {
       display: flex;
+
       input {
         width: 15vw;
         height: 30px;
         margin-right: 5px;
       }
+
       ::placeholder {
         color: #ababab;
         font-size: 1rem;
       }
+
       .search {
         width: 2vw;
         text-align: center;
       }
     }
+
     a {
       color: white;
       text-decoration: none;
@@ -201,13 +198,16 @@ export default {
     }
   }
 }
+
 .navbarSticky {
   position: fixed;
 }
+
 @media (max-width: 1200px) {
   .navbar_root {
     padding: 0 50px;
   }
+
   .navigation_content_right {
     .product_category_search {
       ::placeholder {
@@ -216,51 +216,62 @@ export default {
     }
   }
 }
+
 @media (max-width: 992px) {
   .navbar_root {
     .brand_name {
       order: 1;
+
       h1 {
         a {
           font-size: 2rem;
         }
       }
     }
+
     .navigation_btn_rwd {
       order: 3;
     }
+
     .navigation_content {
       order: 4;
+
       .product_category_search {
         input {
           width: 25vw;
         }
+
         ::placeholder {
           font-size: 1rem;
         }
       }
     }
+
     .shopping_cart_root {
       order: 2;
     }
   }
 }
+
 @media (max-width: 576px) {
   .navbar_root {
-    .navbar-brand{
+    .navbar-brand {
       margin: 0;
+
       h1 {
         a {
           font-size: 1.5rem;
         }
       }
     }
+
     .navigation_content {
-      .navbar-nav{
+      .navbar-nav {
         a {
           font-size: 1rem;
           line-height: 1rem;
         }
+
         .product_category_search {
           input {
             width: 45vw;

@@ -6,7 +6,7 @@ import VueAxios from 'vue-axios'
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
     orgProductsClassic: [],
     orgProductsNews: [],
@@ -123,3 +123,7 @@ export default new Vuex.Store({
     }
   }
 })
+
+export const useStore = () => store;
+
+export default store;

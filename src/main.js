@@ -13,6 +13,11 @@ import 'vue-loading-overlay/dist/vue-loading.css'
 
 import App from './App'
 
+// Support Composition API
+// https://github.com/vuejs/composition-api
+import VueCompositionAPI from '@vue/composition-api'
+Vue.use(VueCompositionAPI)
+
 Vue.use(BootstrapVue)
 
 Vue.component('Loading', Loading)
