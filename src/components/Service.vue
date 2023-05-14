@@ -1,12 +1,7 @@
 <template>
   <div class="service">
     <b-row>
-      <b-col
-        v-for="(service, index) in serviceContent"
-        :key="index"
-        cols="12"
-        lg="4"
-      >
+      <b-col v-for="(service, index) in serviceContent" :key="index" cols="12" lg="4">
         <i :class="service.style"></i>
         <div class="detail">
           <h4>{{ service.title }}</h4>
@@ -18,25 +13,29 @@
 </template>
 
 <script>
+import { reactive } from '@vue/composition-api'
+
 export default {
   name: 'Service',
-  data () {
+  setup() {
+    const serviceContent = reactive([
+      {
+        title: '酒品',
+        description: '最棒的酒款',
+        style: 'fas fa-wine-glass-alt'
+      }, {
+        title: '滿額',
+        description: '購滿$2,000就可免運',
+        style: 'fas fa-comment-dollar'
+      }, {
+        title: '寄送服務',
+        description: '恆溫的寄送服務',
+        style: 'fas fa-truck'
+      }
+    ]);
+
     return {
-      serviceContent: [
-        {
-          title: '酒品',
-          description: '最棒的酒款',
-          style: 'fas fa-wine-glass-alt'
-        }, {
-          title: '滿額',
-          description: '購滿$2,000就可免運',
-          style: 'fas fa-comment-dollar'
-        }, {
-          title: '寄送服務',
-          description: '恆溫的寄送服務',
-          style: 'fas fa-truck'
-        }
-      ]
+      serviceContent
     }
   }
 }
@@ -55,12 +54,16 @@ export default {
 
   .detail {
     margin: 25px;
-    h4, p {
+
+    h4,
+    p {
       text-align: center;
     }
+
     h4 {
       font-size: 20px;
     }
+
     p {
       font-size: 15px;
     }
