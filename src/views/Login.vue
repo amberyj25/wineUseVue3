@@ -24,38 +24,47 @@
 </template>
 
 <script>
-import HeaderNavbar from '@/layout/HeaderNavbar.vue'
+import { reactive, ref } from '@vue/composition-api';
+import { useRoute } from "@/useRoute.js";
+import { useStore } from "@/store";
+import HeaderNavbar from '@/layout/HeaderNavbar.vue';
+import axios from 'axios';
 
 export default {
   name: 'Login',
   components: {
     HeaderNavbar
   },
-  data () {
-    return {
-      user: {
-        username: '',
-        password: ''
-      },
-      notSuccess: ''
-    }
-  },
-  methods: {
-    signin () {
-      this.axios
-        .post('https://vue-course-api.hexschool.io/signin', this.user)
+  setup() {
+    const { router } = useRoute();
+    const store = useStore();
+    const user = reactive({
+      username: '',
+      password: ''
+    });
+    const notSuccess = ref('');
+
+    const signin = () => {
+      axios
+        .post('https://vue-course-api.hexschool.io/signin', user)
         .then(result => {
-          const isResultSuccess = result.data.success
+          const isResultSuccess = result.data.success;
           switch (isResultSuccess) {
             case true:
-              this.$router.push('/')
-              this.$store.commit('checkSignIn', true)
-              break
+              router.push('/');
+              store.commit('checkSignIn', true);
+              break;
             case false:
-              this.notSuccess = '沒有登入成功'
-              break
+              notSuccess.value = '沒有登入成功';
+              break;
           }
         })
+    }
+
+    return {
+      user,
+      notSuccess,
+      signin
     }
   }
 }
@@ -65,6 +74,7 @@ export default {
   background-color: #494b50;
   margin: 0;
 }
+
 .form_outer {
   width: 100vw;
   height: 100vh;
@@ -74,6 +84,7 @@ export default {
   align-items: center;
   margin: 0;
   background-color: #494b50;
+
   form {
     width: 35%;
     background: #abdadc;
@@ -83,12 +94,15 @@ export default {
     display: flex;
     justify-content: center;
     box-shadow: 2px 2px 8px black;
+
     div {
       margin: 15px;
+
       label {
         display: block;
         margin: 5px 0;
       }
+
       input {
         width: 85%;
         height: 25px;
@@ -97,6 +111,7 @@ export default {
         outline: none;
         padding: 5px 15px;
       }
+
       button {
         display: block;
         width: 100px;
@@ -105,6 +120,7 @@ export default {
         border-radius: 8px;
         margin-top: 25px;
       }
+
       p {
         text-align: center;
         color: yellow;
@@ -112,12 +128,15 @@ export default {
     }
   }
 }
+
 @media (max-width: 960px) {
   .form_outer {
     form {
       width: 45%;
-      div{
+
+      div {
         margin: 0;
+
         input {
           width: 90%;
         }
@@ -125,17 +144,19 @@ export default {
     }
   }
 }
+
 @media (max-width: 540px) {
   .form_outer {
     form {
       width: 75%;
-      div{
+
+      div {
         margin: 0;
+
         input {
           width: 90%;
         }
       }
     }
   }
-}
-</style>
+}</style>
