@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from '@vue/composition-api'
+import { ref, computed } from '@vue/composition-api'
 import { useRoute } from "@/useRoute.js"
 import { useStore } from "@/store"
 import Navbar from '@/components/Navbar.vue'

@@ -22,6 +22,7 @@ import HeaderNavbarAndCarousel from '@/layout/HeaderNavbarAndCarousel.vue'
 import Introduction from '@/components/Introduction.vue'
 import Products from '@/components/Products.vue'
 import Footer from '@/layout/Footer.vue'
+import { ref } from '@vue/composition-api'
 
 export default {
   name: 'App',
@@ -31,14 +32,15 @@ export default {
     Products,
     Footer
   },
-  data () {
+  setup() {
+    const isLoading = ref(true);
+    const getLoadingData = (isLoadingData) => {
+      isLoading.value = isLoadingData;
+    };
+
     return {
-      isLoading: true
-    }
-  },
-  methods: {
-    getLoadingData (isLoadingData) {
-      this.isLoading = isLoadingData
+      isLoading,
+      getLoadingData
     }
   }
 }
