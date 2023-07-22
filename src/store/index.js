@@ -17,6 +17,10 @@ const store = new Vuex.Store({
     currentShoppingCartNew: [],
     searchProductCategory: ''
   },
+  getters: {
+    orgProductsClassic: state => state.orgProductsClassic,
+    orgProductsNews: state => state.orgProductsNews
+  },
   mutations: {
     getOrgProductsClassic (state, payload) {
       payload.map(item => {
