@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted, computed, watch } from '@vue/composition-api'
+import { ref, reactive, onMounted, computed, watch } from '@vue/composition-api'
 import { useStore } from "@/store"
 import { useRoute } from "@/useRoute.js";
 import HeaderNavbar from '@/layout/HeaderNavbar.vue'
@@ -84,8 +84,8 @@ export default {
     const store = useStore();
     const { router } = useRoute();
     const wineCategory = reactive(['新款', '經典款', '全部酒品']);
-    const categoryRender = ref('全部酒品');
-    const classicAndNewData = reactive([]);
+    const categoryRender = ref('新款');
+    const classicAndNewData = ref([]);
     const isLoading = ref(true);
     const searchProductCategory = computed(() => store.state.searchProductCategory);
     const categoryProducts = computed(() => {
@@ -94,15 +94,30 @@ export default {
       // if 這行主要判斷 是 使用到 Navbar search 功能, 還是使用 這個頁面的 酒品分類選單
       // 使用 Navbar search 功能 - 才會 觸發 checkSearchProductCategory()
       // 使用 這個頁面的 酒品分類選單 - 不會 觸發 checkSearchProductCategory()
+      let getVuexProductsClassic = {
+        title: '經典款',
+        data: store.getters.orgProductsClassic
+      }
+      let getVuexProductsNew = {
+        title: '新款',
+        data: store.getters.orgProductsNews
+      }
+
+      if (!getVuexProductsClassic['data'].length || !getVuexProductsNew['data'].length) return [];
+      classicAndNewData.value = []
+      classicAndNewData.value.push(getVuexProductsClassic)
+      classicAndNewData.value.push(getVuexProductsNew)
+      isLoading.value = false;
+
       if (searchProductCategory) checkSearchProductCategory()
 
       switch (categoryRender.value) {
         case '新款':
-          return classicAndNewData.filter(item => item.title === '新款');
+          return classicAndNewData.value.filter(item => item.title === '新款');
         case '經典款':
-          return classicAndNewData.filter(item => item.title === '經典款');
+          return classicAndNewData.value.filter(item => item.title === '經典款');
         case '全部酒品':
-          return classicAndNewData;
+          return classicAndNewData.value;
       }
     });
     const checkSearchProductCategory = () => {
@@ -201,23 +216,6 @@ export default {
       store.dispatch('getOrgProductsNews');
       store.dispatch('getCurrentShoppingCartClassic');
       store.dispatch('getCurrentShoppingCartNew');
-    });
-    watch(() => store.state.orgProductsNews, (n, o) => {
-      const tempNewData = {
-        title: '新款',
-        data: n
-      };
-
-      classicAndNewData.push(tempNewData);
-    });
-    watch(() => store.state.orgProductsClassic, (n, o) => {
-      const tempNewData = {
-        title: '經典款',
-        data: n
-      };
-
-      classicAndNewData.push(tempNewData);
-      isLoading.value = false;
     });
 
     return {

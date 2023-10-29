@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, watch } from '@vue/composition-api'
+import { ref, reactive, onMounted, computed, watch } from '@vue/composition-api'
 import { useStore } from "@/store"
 
 export default {
@@ -69,8 +69,8 @@ export default {
   emits: ['getLoadingData'],
   setup(props, { emit }) {
     const store = useStore();
-    const classicData = ref([]);
-    const newData = ref([]);
+    const classicData = reactive({});
+    const newData = reactive({});
     const currentClassicPage = ref(1);
     const currentNewPage = ref(1);
     const tempClassicData = ref([]);
@@ -83,20 +83,18 @@ export default {
       store.dispatch('getCurrentShoppingCartNew');
     });
 
-    watch(() => store.state.orgProductsClassic, (n, o) => {
-      n.forEach(item => classicData.value.push(item))
-    });
-    watch(() => store.state.orgProductsNews, (n, o) => {
-      n.forEach(item => newData.value.push(item))
-    });
-
     const categoryProducts = computed(() => {
       let tempAllData = [];
+      let getVuexProductsClassic = store.getters.orgProductsClassic
+      let getVuexProductsNew = store.getters.orgProductsNews
 
-      if (!classicData.value.length || !newData.value.length) return;
-      getClassicData(tempAllData);
-      getNewData(tempAllData);
-
+      if (!getVuexProductsClassic.length || !getVuexProductsNew.length) return [];
+      classicData['title'] = '經典款'
+      newData['title'] = '新款'
+      classicData['data'] = currentClassicPage.value === 1 ? getVuexProductsClassic.filter(item => item.num < 5) : getVuexProductsClassic.filter(item => item.num >= 5)
+      newData['data'] = currentNewPage.value === 1 ? getVuexProductsNew.filter(item => item.num < 5) : getVuexProductsNew.filter(item => item.num >= 5)
+      tempAllData.push(classicData)
+      tempAllData.push(newData)
       emit('getLoadingData', false);
       return tempAllData;
     });
