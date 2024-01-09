@@ -13,7 +13,7 @@
           <span>{{ classicProduct.product.title }}</span>
           <span>{{ classicProduct.qty }}瓶</span>
           <span>${{ classicProduct.qty * classicProduct.product.price }}</span>
-          <span @click.prevent="deleteClassicProduct(classicProduct.id)" class="deleteIcon">
+          <span @click.prevent="deleteClassicProduct(classicProduct.product_id)" class="deleteIcon">
             <i class="far fa-trash-alt"></i>
           </span>
         </div>
@@ -25,7 +25,7 @@
           <span>{{ newProduct.product.title }}</span>
           <span>{{ newProduct.qty }}瓶</span>
           <span>${{ newProduct.qty * newProduct.product.price }}</span>
-          <span @click.prevent="deleteNewProduct(newProduct.id)" class="deleteIcon">
+          <span @click.prevent="deleteNewProduct(newProduct.product_id)" class="deleteIcon">
             <i class="far fa-trash-alt"></i>
           </span>
         </div>
